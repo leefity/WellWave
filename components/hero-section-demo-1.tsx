@@ -1,13 +1,11 @@
 "use client";
 
 
-import { BentoGrid } from "@/components/ui/bento-grid";
 import { motion } from "motion/react";
-import { FeatureBentoGrid } from "./_components/FeatureBentoGrid";
 
 export default function HeroSectionOne() {
   return (
-    <div className="relative  my-10 flex  flex-col items-center justify-center">
+    <div className="relative mx-auto my-10 flex max-w-7xl flex-col items-center justify-center">
       <Navbar />
       <div className="absolute inset-y-0 left-0 h-full w-px bg-neutral-200/80 dark:bg-neutral-800/80">
         <div className="absolute top-0 h-40 w-px bg-gradient-to-b from-transparent via-blue-500 to-transparent" />
@@ -20,7 +18,7 @@ export default function HeroSectionOne() {
       </div>
       <div className="px-4 py-10 md:py-20">
         <h1 className="relative z-10 mx-auto max-w-4xl text-center text-2xl font-bold text-slate-700 md:text-4xl lg:text-7xl dark:text-slate-300">
-          {"Redefining Patient Care with AI-Powered Voice Solutions"
+          {"Launch your website in hours, not days"
             .split(" ")
             .map((word, index) => (
               <motion.span
@@ -51,7 +49,9 @@ export default function HeroSectionOne() {
           }}
           className="relative z-10 mx-auto max-w-xl py-4 text-center text-lg font-normal text-neutral-600 dark:text-neutral-400"
         >
-          Instant, accurate medical help just a conversation away. Automate scheduling, symptom checks, and follow-ups anytime, day or night.
+          With AI, you can launch your website in hours, not days. Try our best
+          in class, state of the art, cutting edge AI tools to get your website
+          up.
         </motion.p>
         <motion.div
           initial={{
@@ -99,7 +99,6 @@ export default function HeroSectionOne() {
           </div>
         </motion.div>
       </div>
-      <FeatureBentoGrid></FeatureBentoGrid>
     </div>
   );
 }
@@ -117,4 +116,3 @@ const Navbar = () => {
     </nav>
   );
 };
-
