@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import Vapi from '@vapi-ai/web';
 import { index } from 'drizzle-orm/gel-core';
 
+// Define the types for your data structures
 export type medicalReport = {
     chiefComplaint: string,
     symptoms: string[],
@@ -26,16 +27,40 @@ export type sessionDetail = {
     report: medicalReport,
     selectedDoctor: doctorAgent,
     createdOn: string,
-
 }
+
 type messages = {
     role: string,
     text: string
 }
 
+// Reusable popup component to display the call limit message
+function CallLimitPopup({ show, onClose }: { show: boolean, onClose: () => void }) {
+    if (!show) {
+        return null;
+    }
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+                <h2 className="text-xl font-bold mb-4">Call Limit Reached</h2>
+                <p className="text-gray-700">
+                    You have reached the maximum number of 9 calls. Please try again later.
+                </p>
+                <button
+                    onClick={onClose}
+                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                    Close
+                </button>
+            </div>
+        </div>
+    );
+}
+
 function MedicalAgent() {
     const { sessionId } = useParams();
-    const router = useRouter(); // Initialize the router
+    const router = useRouter();
     const [sessionDetail, setSessionDetail] = useState<sessionDetail>();
     const [callStarted, setCallStarted] = useState(false);
     const [vapiInstance, setVapiInstance] = useState<any>();
@@ -44,32 +69,46 @@ function MedicalAgent() {
     const [messages, setMessages] = useState<messages[]>([]);
     const [loading, setLoading] = useState(false);
 
-    // Fetch session details on component load
+    // Initialize callCount by reading from local storage.
+    // If local storage is empty, default to 0.
+    const [callCount, setCallCount] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const storedCount = localStorage.getItem('callCount');
+            return storedCount ? parseInt(storedCount, 10) : 0;
+        }
+        return 0;
+    });
+    const [showPopup, setShowPopup] = useState(false);
+
+    // Update local storage whenever callCount changes
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('callCount', String(callCount));
+        }
+    }, [callCount]);
+
     useEffect(() => {
         sessionId && GetSessionDetails();
     }, [sessionId])
 
-    // Centralized Vapi instance and event handling logic
     useEffect(() => {
         if (!vapiInstance) return;
 
-        // Listeners for Vapi events
-        const onCallStart = () => setCallStarted(true);
+        const onCallStart = () => {
+            setCallStarted(true);
+            setCallCount(prevCount => prevCount + 1);
+        };
         const onCallEnd = async () => {
             setCallStarted(false);
-            console.log('Call ended. Generating report...');
             setLoading(true);
-            // Trigger report generation after the call is officially over
             await GenerateReport();
             setLoading(false);
-            // Redirect to the dashboard after the call ends
             router.push('/dashboard');
         };
 
         const onMessage = (message: any) => {
             if (message.type === 'transcript') {
                 const { role, transcriptType, transcript } = message;
-                console.log(`${role}: ${transcript}`);
                 if (transcriptType === 'partial') {
                     setLiveTranscript(transcript);
                     setCurrentRole(role);
@@ -85,7 +124,6 @@ function MedicalAgent() {
         vapiInstance.on('call-end', onCallEnd);
         vapiInstance.on('message', onMessage);
 
-        // Clean up event listeners on component unmount or when dependencies change
         return () => {
             if (vapiInstance) {
                 vapiInstance.off('call-start', onCallStart);
@@ -93,15 +131,20 @@ function MedicalAgent() {
                 vapiInstance.off('message', onMessage);
             }
         };
-    }, [vapiInstance, sessionId, messages, sessionDetail, router]); // Add router to the dependency array
+    }, [vapiInstance, sessionId, messages, sessionDetail, router]);
 
     const GetSessionDetails = async () => {
         const result = await axios.get('/api/session-chat?sessionId=' + sessionId);
-        console.log(result.data);
         setSessionDetail(result.data);
     }
 
     const StartCall = () => {
+        // Check if the call limit has been reached
+        if (callCount >= 9) {
+            setShowPopup(true);
+            return;
+        }
+
         if (vapiInstance) {
             vapiInstance.start(process.env.NEXT_PUBLIC_VAPI_VOICE_AGENT_ID);
         } else {
@@ -124,11 +167,9 @@ function MedicalAgent() {
                 sessionDetail: sessionDetail,
                 sessionId: sessionId
             });
-            console.log("Report generation successful:", result.data);
             return result.data;
         } catch (e) {
             console.error("Failed to generate report on client side:", e);
-            // You might want to handle this error more gracefully in the UI
         }
     }
 
@@ -147,6 +188,7 @@ function MedicalAgent() {
                 />
                 <h2 className='mt-2 text-lg'>{sessionDetail?.selectedDoctor?.specialist}</h2>
                 <p className='text-sm text-gray-400'>AI Medical Agent</p>
+                <p className='text-sm text-gray-400'>Voice ID: {sessionDetail?.selectedDoctor?.voiceId}</p>
 
                 <div className='mt-12 overflow-y-auto flex flex-col items-center px-10 md:px-28 lg:px-52 xl:px-72'>
                     {messages?.slice(-4).map((msg: messages, index) => (
@@ -155,8 +197,12 @@ function MedicalAgent() {
                     {liveTranscript && liveTranscript.length > 0 && <h2 className='text-lg'>{currentRole} : {liveTranscript}</h2>}
                 </div>
 
+                <div className='mt-8 text-center'>
+                    <p className='text-sm text-gray-500'>Calls remaining: {9 - callCount}</p>
+                </div>
+
                 {!callStarted ? (
-                    <Button className='mt-20' onClick={StartCall} disabled={loading}>
+                    <Button className='mt-2' onClick={StartCall} disabled={loading || callCount >= 9}>
                         {loading ? <Loader className='animate-spin' /> : <PhoneCall />} Start Call
                     </Button>
                 ) : (
@@ -165,6 +211,8 @@ function MedicalAgent() {
                     </Button>
                 )}
             </div>}
+            
+            <CallLimitPopup show={showPopup} onClose={() => setShowPopup(false)} />
         </div>
     )
 }
