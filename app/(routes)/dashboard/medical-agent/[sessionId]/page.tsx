@@ -45,7 +45,7 @@ function CallLimitPopup({ show, onClose }: { show: boolean, onClose: () => void 
             <div className="bg-white p-6 rounded-lg shadow-lg text-center">
                 <h2 className="text-xl font-bold mb-4">Call Limit Reached</h2>
                 <p className="text-gray-700">
-                    You have reached the maximum number of 9 calls. Please try again later.
+                    You have reached the maximum number of 2 calls. Please try again later.
                 </p>
                 <button
                     onClick={onClose}
@@ -140,7 +140,7 @@ function MedicalAgent() {
 
     const StartCall = () => {
         // Check if the call limit has been reached
-        if (callCount >= 9) {
+        if (callCount >= 2) {
             setShowPopup(true);
             return;
         }
@@ -198,11 +198,11 @@ function MedicalAgent() {
                 </div>
 
                 <div className='mt-8 text-center'>
-                    <p className='text-sm text-gray-500'>Calls remaining: {9 - callCount}</p>
+                    <p className='text-sm text-gray-500'>Calls remaining: {2 - callCount}</p>
                 </div>
 
                 {!callStarted ? (
-                    <Button className='mt-2' onClick={StartCall} disabled={loading || callCount >= 9}>
+                    <Button className='mt-2' onClick={StartCall} disabled={loading || callCount >= 2}>
                         {loading ? <Loader className='animate-spin' /> : <PhoneCall />} Start Call
                     </Button>
                 ) : (
