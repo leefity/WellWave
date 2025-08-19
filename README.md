@@ -1,36 +1,117 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# WellWave – AI Health Consultation Voice Assistant
 
-## Getting Started
+## 📑 Table of Contents
+- [Problem Statement](#-problem-statement)
+- [Tech Stack](#-tech-stack)
+- [Process Flow](#-process-flow)
+- [Solution Description](#-solution-description)
+- [System Architecture](#-system-architecture)
+- [Features](#-features)
+- [Future Enhancements](#-future-enhancements)
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 📌 Problem Statement
+Access to healthcare can be complex and fragmented.  
+Patients often struggle with:
+- Identifying the right specialist for their symptoms.  
+- Maintaining records of past consultations.  
+- Booking consultations quickly and easily.  
+- Communicating naturally with doctors.  
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**WellWave** solves this by providing an **AI-enabled voice assistant** for end-to-end healthcare consultation:
+- From symptom entry → doctor matching → booking → real-time voice consultation → logs and records.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ⚙️ Tech Stack
 
-## Learn More
+### Frontend
+- **Next.js (React Framework)** – UI and routing.  
+- **TypeScript** – Strong typing for scalable and safe development.  
+- **Tailwind CSS / shadcn/ui** – Modern styling and UI components.  
 
-To learn more about Next.js, take a look at the following resources:
+### Backend
+- **Drizzle ORM** – Type-safe ORM for managing queries.  
+- **Neon Database (PostgreSQL Cloud)** – Stores users, consultations, logs, and bookings.  
+- **Next.js API Routes** – Serverless backend logic.  
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### AI & Voice Layer
+- **OpenAI GPT** – Symptom analysis, AI consultation notes.  
+- **OpenAI Whisper** – Speech-to-text for user input and consultations.  
+- **SMD AI & Wappy AI** – Additional AI modules for medical decision support and voice enhancements.  
+- **WebRTC** – Real-time doctor-patient voice consultation.  
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Infrastructure
+- **Authentication** – Clerk
+- **Cloud Deployment** – (Vercel for frontend, Neon for database).  
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🔄 Process Flow
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **User Authentication**  
+   - Signup/login via Clerk
+   - User data securely stored in Neon DB.  
+
+2. **Dashboard**  
+   - Displays upcoming consultations, past logs, and symptom history.  
+
+3. **Symptom Entry & AI Assistance**  
+   - User enters symptoms (voice/text).  
+   - Whisper → converts voice to text.  
+   - GPT + SMD AI + Wappy AI → analyze symptoms and suggest doctors.  
+
+4. **Doctor Matching & Booking**  
+   - List of specialists shown.  
+   - User books a consultation slot.  
+   - Stored in Neon DB via Drizzle ORM.  
+
+5. **Voice Consultation**  
+   - At appointment time → patient joins a **WebRTC** call with the doctor.  
+   - AI may assist with note-taking and translation.  
+
+6. **Logs & Records**  
+   - Consultation notes + transcripts saved in Neon DB.  
+   - Accessible later via dashboard.  
+
+---
+
+## ✅ Solution Description
+**WellWave** is an **AI-powered healthcare voice assistant** designed to make healthcare:  
+- **Simple** – Patients use natural voice/text to describe symptoms.  
+- **Smart** – AI triages symptoms and matches with the right specialist.  
+- **Seamless** – Booking and consultation happen on the same platform.  
+- **Secure** – All records stored in encrypted Neon PostgreSQL DB.  
+
+With AI-driven analysis, patients receive the right consultation quickly while maintaining a digital record of their healthcare journey.
+
+---
+
+## 🏗️ System Architecture
+
+---
+
+
+
+---
+
+## ✨ Features
+- 🔐 Secure **login/signup** with user accounts.  
+- 📊 Personalized **dashboard** with past logs and consultations.  
+- 🎙️ **Voice & text** symptom entry.  
+- 🧠 **AI-driven triage** to suggest relevant doctors.  
+- 📅 **Consultation booking** with specialists.  
+- 📞 Real-time **doctor-patient voice calls**.  
+- 📑 Automatic **consultation logs** and records.  
+
+---
+
+## 🚀 Future Enhancements
+- 🩺 Integration with wearable health devices for real-time vitals.  
+- 🌎 Multi-language support for accessibility.  
+- 📹 Video consultations in addition to voice.  
+- 📜 AI-generated prescription summaries.  
+- 🔔 Smart health reminders & follow-up notifications.  
+
+---
